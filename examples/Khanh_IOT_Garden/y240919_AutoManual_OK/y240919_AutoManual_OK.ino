@@ -7,7 +7,6 @@
 #include "BlynkGate.h"
 #include "MKL_LiquidCrystal_I2C.h"
 #include "MKL_DHT.h"
-// #include "MKL_OneButton.h"
 #include "MAKERLABVN.h"
 
 // Step 3: Setup WiFi
@@ -23,7 +22,6 @@ char pass[] = "";             // Key in your wifi password.
 
 #define analogInPin A2
 
-MKL_DHT dht(DHTPIN, DHT11);
 
 void readLDR();
 void showOnLCD();
@@ -31,10 +29,13 @@ void readDHT11();
 void Bump_control();
 void Auto_Bump();
 
-unsigned long intervalLCD = 0;
-unsigned long lastTimeSend = 0;
+MKL_DHT dht(DHTPIN, DHT11);
 MKL_LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+unsigned long intervalLCD = 0;
+unsigned long lastTimeSend = 0;
+unsigned long intervalBump = 0;
+unsigned long lastMillis = 0;
 bool on = 0;
 bool automatic = true;
 int sensorValue = 0;
@@ -45,6 +46,7 @@ int valueLDR = 0;
 int lightPercent = 0;
 int bumpState = 1;
 int humidityPercen = 0;
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -70,7 +72,6 @@ void loop() {
     showOnLCD();
     intervalLCD = millis();
   }
-  unsigned long intervalBump = 0;
   // Try using millis() and use "Blynk.virtualWrite" at least 10s at a time to avoid spamming the server
   if (millis() - lastTimeSend >= 10000) {
     lastTimeSend = millis();
@@ -179,7 +180,6 @@ void readSMoisture() {
   sensorValue = map(analogRead(analogInPin), 676, 0, 0, 100);
 }
 
-unsigned long lastMillis = 0;
 
 void Bump_control() {
   if (paMyInt != paMyIntLast) {
@@ -194,7 +194,6 @@ void Bump_control() {
     }
   }
 }
-
 
 void Auto_Bump() {
   if (automatic) {
